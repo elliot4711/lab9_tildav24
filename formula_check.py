@@ -1,4 +1,22 @@
 from linkedQfile import LinkedQ
+"""
+Na                     Formeln är syntaktiskt korrekt x
+H2O                    Formeln är syntaktiskt korrekt 
+Si(C3(COOH)2)4(H2O)7   Formeln är syntaktiskt korrekt 
+Na332                  Formeln är syntaktiskt korrekt 
+C(Xx4)5    Okänd atom vid radslutet 4)5
+C(OH4)C    Saknad siffra vid radslutet 
+C(OH4C     Saknad högerparentes vid radslutet
+H2O)Fe     Felaktig gruppstart vid radslutet )Fe 
+H0         För litet tal vid radslutet 
+H1C        För litet tal vid radslutet C 
+H02C       För litet tal vid radslutet 2C 
+Nacl       Saknad stor bokstav vid radslutet cl 
+a          Saknad stor bokstav vid radslutet a 
+(Cl)2)3    Felaktig gruppstart vid radslutet )3
+)          Felaktig gruppstart vid radslutet ) 
+2          Felaktig gruppstart vid radslutet 2 
+"""
 
 periodic_table = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', 'Mg', 
 'Al', 'Si', 'P', 'S', 'Cl', 'Ar', 'K', 'Ca', 'Sc', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni',
@@ -8,22 +26,82 @@ periodic_table = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', 'M
 'Pt', 'Au', 'Hg', 'Tl', 'Pb', 'Bi', 'Po', 'At', 'Rn', 'Fr', 'Ra', 'Ac', 'Th', 'Pa', 'U', 'Np', 'Pu',
 'Am', 'Cm', 'Bk', 'Cf', 'Es', 'Fm', 'Md', 'No', 'Lr', 'Rf', 'Db', 'Sg', 'Bh', 'Hs', 'Mt', 'Ds', 'Rg', 'Cn', 'Fl', "Lv"]
 
-pattern = r'\(|\)'
+def formula():
+    take_input = True
+    while take_input == True:
+        molecule = input("")
+        if molecule == ("#"):
+            take_input = False
+        else:
+            try:
+                que = LinkedQ()
+                for letter in molecule:
+                    que.enqueue(letter)
+                returnvalue = ismolecule(que)
+                print("Formeln är syntaktiskt korrekt")
+            except Syntaxfel as err:
+                returnvalue = str(err.args[0])
+                print(returnvalue)
 
-def ismolecule(molecule):
+def formulatest(molecule):
+    try:
+        que = LinkedQ()
+        for letter in molecule:
+            que.enqueue(letter)
+        returnvalue = ismolecule(que)
+        return("Formeln är syntaktiskt korrekt")
+    except Syntaxfel as err:
+        returnvalue = str(err.args[0])
+        return(returnvalue)
+
+
+def ismolecule(que):
+    que = isgroup(que)
+    if not que.isEmpty():
+        que = ismolecule(que)
+
+def isgroup(que):
     """ 
     Function for testing if input follows syntax for a molecule
     Parameters: text that could be a molecule
     Returns: nothing
     """
 
-    que = LinkedQ()
-    for letter in molecule:
-        que.enqueue(letter)
+    if que.peek().isalpha():
+        que2 = isatom(que)
+        que2 = isnum(que2)
+        
+        return que2
 
-    que2 = isatom(que)
-    isnum(que2)
-    print("Formeln är syntaktiskt korrekt")
+    elif que.peek() == "(":
+        que.dequeue()
+
+        parenthesis_que = LinkedQ()
+        while True:
+            if que.isEmpty():
+                break
+            elif que.peek() == ")":
+                break
+            else:
+                x = que.dequeue()
+                parenthesis_que.enqueue(x)
+        
+        que.dequeue()
+
+        isatom(parenthesis_que)
+        que2 = isnum(que)
+        return que2
+
+    else:
+        word = ""
+        if not que.isEmpty():
+            while not que.isEmpty():
+                l = que.dequeue()
+                word += l
+            raise Syntaxfel(f"Felaktig gruppstart vid radslutet {word}")
+        else:
+            raise Syntaxfel("Felaktig gruppstart vid radslutet")
+
 
 def isatom(que):
     """ 
@@ -35,19 +113,27 @@ def isatom(que):
     x = que.peek()
     if isbigletter(x):
         x = que.dequeue()
-        y = que.peek()
-        if y == None:
+        print(x)
+        if que.isEmpty():
             return que
-        else: 
-            if y.isdigit():
-                return que
-            
-            else:
-                if issmallletter(y):
-                    que.dequeue()
+        y = que.peek()
+        if not y.isalpha():
+            return que
+        else:      
+            if issmallletter(y):
+                que.dequeue()
+                word = x + y
+                if word in periodic_table:
                     return que
                 else:
-                    raise Syntaxfel("Något är fel")
+                    x = que.dequeue()
+                    word = x
+                    while not que.isEmpty():
+                        l = que.dequeue()
+                        word += l
+                    raise Syntaxfel(f"Okänd atom vid radslutet {word}")
+            else:
+                raise Syntaxfel("Något är fel")
             
     else:
         x = que.dequeue()
@@ -64,7 +150,6 @@ def isbigletter(value):
     Parameters: value to check
     Returns: True or False
     """
-
     if value.isupper():
         return True
     else:
@@ -76,7 +161,6 @@ def issmallletter(value):
     Parameters: value to check
     Returns: True or False
     """
-
     if value.islower():
         return True
     else:
@@ -90,12 +174,20 @@ def isnum(que):
     """
 
     if que.peek() == None:
-        return 
+        return que
+    
+    elif not que.peek().isdigit():
+        return que
 
     else:
         y = que.dequeue()
         if 2 <= int(y) <= 9:
-            return True
+            while not que.isEmpty():
+                if que.peek().isdigit():
+                    que.dequeue()
+                else:
+                    break
+            return que
         
         elif y == "0":
             word = ""
@@ -112,9 +204,21 @@ def isnum(que):
                 raise Syntaxfel("För litet tal vid radslutet")
             else:
                 if z.isdigit():
-                    pass
+                    while not que.isEmpty():
+                        if que.peek().isdigit():
+                            que.dequeue()
+                        else:
+                            break
+                    return que
                 else:
-                    raise Syntaxfel("För litet tal vid radslutet")
+                    word = ""
+                    if not que.isEmpty():
+                        while not que.isEmpty():
+                            l = que.dequeue()
+                            word += l
+                        raise Syntaxfel(f"För litet tal vid radslutet {word}")
+                    else:
+                        raise Syntaxfel("För litet tal vid radslutet")
         else:
             print("fel")
 
@@ -125,15 +229,5 @@ class Syntaxfel(Exception):
 
     pass
 
-
-take_input = True
-while take_input == True:
-    molecule = input("")
-    if molecule == ("#"):
-        take_input = False
-    else:
-        try:
-            returnvalue = ismolecule(molecule)
-        except Syntaxfel as err:
-            returnvalue = str(err.args[0])
-            print(returnvalue)
+if __name__ == '__main__':
+    formula()
