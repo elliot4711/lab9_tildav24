@@ -135,7 +135,7 @@ class LinkedQ:
         """
 
         try:
-            x = self.__first.next.get_elements()
+            x = self.__first.get_elements()
             return x
         except:
             return None
