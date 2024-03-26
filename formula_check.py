@@ -79,7 +79,7 @@ def isgroup(que):
         parenthesis_que = LinkedQ()
         while True:
             if que.isEmpty():
-                break
+                raise Syntaxfel("Saknad högerparentes vid radslutet")
             elif que.peek() == ")":
                 break
             else:
