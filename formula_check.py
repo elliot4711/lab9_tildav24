@@ -1,21 +1,21 @@
 from linkedQfile import LinkedQ
 """
 Na                     Formeln är syntaktiskt korrekt x
-H2O                    Formeln är syntaktiskt korrekt 
+H2O                    Formeln är syntaktiskt korrekt x
 Si(C3(COOH)2)4(H2O)7   Formeln är syntaktiskt korrekt 
-Na332                  Formeln är syntaktiskt korrekt 
+Na332                  Formeln är syntaktiskt korrekt x
 C(Xx4)5    Okänd atom vid radslutet 4)5
 C(OH4)C    Saknad siffra vid radslutet 
 C(OH4C     Saknad högerparentes vid radslutet
-H2O)Fe     Felaktig gruppstart vid radslutet )Fe 
-H0         För litet tal vid radslutet 
-H1C        För litet tal vid radslutet C 
-H02C       För litet tal vid radslutet 2C 
-Nacl       Saknad stor bokstav vid radslutet cl 
-a          Saknad stor bokstav vid radslutet a 
-(Cl)2)3    Felaktig gruppstart vid radslutet )3
-)          Felaktig gruppstart vid radslutet ) 
-2          Felaktig gruppstart vid radslutet 2 
+H2O)Fe     Felaktig gruppstart vid radslutet )Fe x
+H0         För litet tal vid radslutet x
+H1C        För litet tal vid radslutet C x
+H02C       För litet tal vid radslutet 2C x
+Nacl       Saknad stor bokstav vid radslutet cl x
+a          Saknad stor bokstav vid radslutet a x
+(Cl)2)3    Felaktig gruppstart vid radslutet )3 x
+)          Felaktig gruppstart vid radslutet ) x 
+2          Felaktig gruppstart vid radslutet 2 x
 """
 
 periodic_table = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', 'Mg', 
@@ -113,7 +113,6 @@ def isatom(que):
     x = que.peek()
     if isbigletter(x):
         x = que.dequeue()
-        print(x)
         if que.isEmpty():
             return que
         y = que.peek()
