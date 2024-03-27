@@ -66,7 +66,6 @@ def isgroup(que):
     Parameters: text that could be a molecule
     Returns: nothing
     """
-    print(que)
     if que.peek() == None:
         raise Syntaxfel("Enter something")
 
@@ -136,6 +135,7 @@ def isatom(que, oldque = None, parenthesis = None):
             return que
         
         elif not y.isalpha():
+            isnum(que, oldque, parenthesis)
             return que
         
         elif y.isupper():
@@ -153,7 +153,7 @@ def isatom(que, oldque = None, parenthesis = None):
                     while not que.isEmpty():
                         l = que.dequeue()
                         word += l
-                    if parenthesis:
+                    if parenthesis != None:
                         word += parenthesis
                     if oldque:
                         while not oldque.isEmpty():
@@ -194,7 +194,7 @@ def issmallletter(value):
     else:
         return False      
 
-def isnum(que):
+def isnum(que, oldque = None, parenthesis = None):
     """ 
     Function for testing if input follows syntax for a number higher or equal to 2
     Parameters: linkedQ object containing all numbers in the atom name
@@ -220,16 +220,40 @@ def isnum(que):
         elif y == "0":
             word = ""
             if not que.isEmpty():
-                while not que.isEmpty():
-                    l = que.dequeue()
-                    word += l
-                raise Syntaxfel(f"För litet tal vid radslutet {word}")
+                if parenthesis != None:
+                    while not que.isEmpty():
+                        l = que.dequeue()
+                        word += l
+                    raise Syntaxfel(f"För litet tal vid radslutet {word + parenthesis}")
+                else:
+                    while not que.isEmpty():
+                        l = que.dequeue()
+                        word += l
+                    raise Syntaxfel(f"För litet tal vid radslutet {word}")
             else:
-                raise Syntaxfel("För litet tal vid radslutet")
+                if parenthesis != None:
+                    if oldque:
+                        while not oldque.isEmpty():
+                            l = oldque.dequeue()
+                            word += l
+                        raise Syntaxfel(f"För litet tal vid radslutet {parenthesis + word}")
+                    else:
+                        raise Syntaxfel(f"För litet tal vid radslutet {parenthesis}")
+                else:
+                    raise Syntaxfel("För litet tal vid radslutet")
         elif y == "1":
             z = que.peek()
             if z == None:
-                raise Syntaxfel("För litet tal vid radslutet")
+                if parenthesis != None:
+                    if oldque:
+                        while not oldque.isEmpty():
+                            l = oldque.dequeue()
+                            word += l
+                        raise Syntaxfel(f"För litet tal vid radslutet {parenthesis + word}")
+                    else:
+                        raise Syntaxfel(f"För litet tal vid radslutet {parenthesis}")
+                else:
+                    raise Syntaxfel("För litet tal vid radslutet")
             else:
                 if z.isdigit():
                     while not que.isEmpty():
@@ -246,7 +270,10 @@ def isnum(que):
                             word += l
                         raise Syntaxfel(f"För litet tal vid radslutet {word}")
                     else:
-                        raise Syntaxfel("För litet tal vid radslutet")
+                        if parenthesis != None:
+                            raise Syntaxfel(f"För litet tal vid radslutet {parenthesis}")
+                        else:
+                            raise Syntaxfel("För litet tal vid radslutet")
         else:
             print("fel")
 

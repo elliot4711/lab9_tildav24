@@ -50,7 +50,7 @@ class LinkedQ:
         count = 1
         while y != None :
             x = (y.get_elements())
-            z = z + x + " "
+            z = z + x
             y = y.next
             count+=1
         return z
