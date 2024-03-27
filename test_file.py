@@ -24,6 +24,7 @@ class TestSequence(unittest.TestCase):
         ["14", formulatest("(Cl)2)3"), "Felaktig gruppstart vid radslutet )3"],
         ["15", formulatest(")"), "Felaktig gruppstart vid radslutet )"],
         ["16", formulatest("2"), "Felaktig gruppstart vid radslutet 2"],
+        ["17", formulatest("(H0)"), "För litet tal vid radslutet"]
     ])
     def test_sequence(self, name, a, b):
         self.assertEqual(a,b)

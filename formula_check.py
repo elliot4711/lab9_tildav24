@@ -66,6 +66,7 @@ def isgroup(que):
     Parameters: text that could be a molecule
     Returns: nothing
     """
+    print(que)
     if que.peek() == None:
         raise Syntaxfel("Enter something")
 
@@ -89,7 +90,9 @@ def isgroup(que):
             elif que.peek() == ")":
                 x = que.dequeue()
                 y = que.peek()
-                if y.isdigit():
+                if y == None:
+                    break
+                elif y.isdigit():
                     break
                 else:
                     word = ""
