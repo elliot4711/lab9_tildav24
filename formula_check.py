@@ -66,6 +66,9 @@ def isgroup(que):
     Parameters: text that could be a molecule
     Returns: nothing
     """
+    if que.peek() == None:
+        raise Syntaxfel("Enter something")
+
     if que.peek().isalpha():
         que2 = isatom(que)
         que2 = isnum(que2)
