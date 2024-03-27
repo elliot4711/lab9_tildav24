@@ -5,7 +5,7 @@ H2O                    Formeln är syntaktiskt korrekt x
 Si(C3(COOH)2)4(H2O)7   Formeln är syntaktiskt korrekt 
 Na332                  Formeln är syntaktiskt korrekt x
 C(Xx4)5    Okänd atom vid radslutet 4)5
-C(OH4)C    Saknad siffra vid radslutet 
+C(OH4)C    Saknad siffra vid radslutet C
 C(OH4C     Saknad högerparentes vid radslutet
 H2O)Fe     Felaktig gruppstart vid radslutet )Fe x
 H0         För litet tal vid radslutet x
@@ -66,7 +66,6 @@ def isgroup(que):
     Parameters: text that could be a molecule
     Returns: nothing
     """
-
     if que.peek().isalpha():
         que2 = isatom(que)
         que2 = isnum(que2)
@@ -80,15 +79,28 @@ def isgroup(que):
         while True:
             if que.isEmpty():
                 raise Syntaxfel("Saknad högerparentes vid radslutet")
+            
+            elif que.peek() == "(":
+                que = isgroup(que)
+
             elif que.peek() == ")":
-                break
+                x = que.dequeue()
+                y = que.peek()
+                if y.isdigit():
+                    break
+                else:
+                    word = ""
+                    if not que.isEmpty():
+                        while not que.isEmpty():
+                            l = que.dequeue()
+                            word += l
+                    raise Syntaxfel(f"Saknad siffra vid radslutet {word}")
             else:
                 x = que.dequeue()
                 parenthesis_que.enqueue(x)
         
-        que.dequeue()
-
-        isatom(parenthesis_que)
+        
+        isatom(parenthesis_que, que, x)
         que2 = isnum(que)
         return que2
 
@@ -103,7 +115,7 @@ def isgroup(que):
             raise Syntaxfel("Felaktig gruppstart vid radslutet")
 
 
-def isatom(que):
+def isatom(que, oldque = None, parenthesis = None):
     """ 
     Function for testing if input follows syntax for an atom
     Parameters: linkedQ object containing all letters and numbers in the atom name
@@ -113,11 +125,16 @@ def isatom(que):
     x = que.peek()
     if isbigletter(x):
         x = que.dequeue()
+        y = que.peek()
         if que.isEmpty():
             return que
-        y = que.peek()
-        if not y.isalpha():
+        
+        elif not y.isalpha():
             return que
+        
+        elif y.isupper():
+            return que
+        
         else:      
             if issmallletter(y):
                 que.dequeue()
@@ -130,6 +147,12 @@ def isatom(que):
                     while not que.isEmpty():
                         l = que.dequeue()
                         word += l
+                    if parenthesis:
+                        word += parenthesis
+                    if oldque:
+                        while not oldque.isEmpty():
+                            l = oldque.dequeue()
+                            word += l
                     raise Syntaxfel(f"Okänd atom vid radslutet {word}")
             else:
                 raise Syntaxfel("Något är fel")
