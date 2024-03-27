@@ -25,7 +25,10 @@ class TestSequence(unittest.TestCase):
         ["15", formulatest(")"), "Felaktig gruppstart vid radslutet )"],
         ["16", formulatest("2"), "Felaktig gruppstart vid radslutet 2"],
         ["17", formulatest("(H0)"), "För litet tal vid radslutet )"],
-        ["18", formulatest("(H0)2"), "För litet tal vid radslutet )2"]
+        ["18", formulatest("(H0)2"), "För litet tal vid radslutet )2"],
+        ["19", formulatest("(H1)"), "För litet tal vid radslutet )"],
+        ["20", formulatest("(H123)2"), "Formeln är syntaktiskt korrekt"],
+        ["21", formulatest("Si(C3(COOH)1)14(H2O)0"), "För litet tal vid radslutet )14(H2O)0"]
     ])
     def test_sequence(self, name, a, b):
         self.assertEqual(a,b)

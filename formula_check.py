@@ -246,6 +246,7 @@ def isnum(que, oldque = None, parenthesis = None):
             if z == None:
                 if parenthesis != None:
                     if oldque:
+                        word = ""
                         while not oldque.isEmpty():
                             l = oldque.dequeue()
                             word += l
