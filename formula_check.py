@@ -135,12 +135,39 @@ def isatom(que, oldque = None, parenthesis = None):
             return que
         
         elif not y.isalpha():
-            isnum(que, oldque, parenthesis)
-            return que
+            if x in periodic_table:
+                isnum(que, oldque, parenthesis)
+                return que
+            else:
+                x = que.dequeue()
+                word = x
+                while not que.isEmpty():
+                    l = que.dequeue()
+                    word += l
+                if parenthesis != None:
+                    word += parenthesis
+                if oldque:
+                    while not oldque.isEmpty():
+                        l = oldque.dequeue()
+                        word += l
+                raise Syntaxfel(f"Okänd atom vid radslutet {word}")
         
         elif y.isupper():
-            return que
-        
+            if x in periodic_table:
+                return que
+            else:
+                x = que.dequeue()
+                word = x
+                while not que.isEmpty():
+                    l = que.dequeue()
+                    word += l
+                if parenthesis != None:
+                    word += parenthesis
+                if oldque:
+                    while not oldque.isEmpty():
+                        l = oldque.dequeue()
+                        word += l
+                raise Syntaxfel(f"Okänd atom vid radslutet {word}")
         else:      
             if issmallletter(y):
                 que.dequeue()
