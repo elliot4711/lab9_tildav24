@@ -76,19 +76,7 @@ def isgroup(que):
     
     elif que.peek() == "(":
         que = parenthesishandling(que)
-
-    elif que.peek() == ")":
-        que = parenthesishandling(que)
-        if que.peek().isalpha():
-            word = ")"
-            word += get_word(que)
-            raise Syntaxfel(f"Felaktig gruppstart vid radslutet {word}")
-        if que.peek().isdigit():
-            word = ")"
-            word += get_word(que)
-            raise Syntaxfel(f"Felaktig gruppstart vid radslutet {word}")
-        else:
-            return que
+        return que
    
     else:
         word = get_word(que)
@@ -98,31 +86,42 @@ def isgroup(que):
 def parenthesishandling(que):
     if DEBUG:
         print("parenthesishandling")
+        print(que)
 
-    while not que.isEmpty():
-        if que.peek() == "(":
-            que.dequeue()
-            if que.peek() == ("("):
+    que.dequeue()
+
+    if que.peek() == "(":
+        que = parenthesishandling(que)
+
+    elif que.peek().isalpha():
+        while not que.isEmpty():
+            que = isatom(que)
+            que = isnum(que)
+
+            if que.peek() == "(":
                 que = parenthesishandling(que)
-            else:
-                que = ismolecule(que)
 
-        elif que.peek() == (")"):
-            que.dequeue()
-            if que.peek().isdigit():
-                que = isnum(que)
-            
-            elif que.peek().isalpha():
-                return que
-            
-            else:
-                word = get_word(que)
-                raise Syntaxfel(f"Saknad siffra vid radslutet {word}")
-            
-            return que
+            if que.peek() == (")"):
+                que.dequeue()
+                if que.isEmpty():
+                    word = get_word(que)
+                    raise Syntaxfel(f"Saknad siffra vid radslutet {word}")
+                    
+                elif que.peek().isdigit():
+                    que = isnum(que)
+                    return que
+                
+                else:
+                    word = get_word(que)
+                    raise Syntaxfel(f"Saknad siffra vid radslutet {word}")
+
+        word = get_word(que)
+        raise Syntaxfel(f"Saknad högerparentes vid radslutet {word}") 
     
-    word = get_word(que)
-    raise Syntaxfel(f"Saknad högerparantes vid radslutet {word}")        
+    else:
+        word = get_word(que)
+        raise Syntaxfel(f"Felaktig gruppstart vid radslutet {word}")
+           
       
 
 def isatom(que):
@@ -151,7 +150,11 @@ def isatom(que):
                 raise Syntaxfel(f"Okänd atom vid radslutet {word}")
         
         else:
-            return que
+            if firstletter in periodic_table:
+                return que
+            else:
+                word = get_word(que)
+                raise Syntaxfel(f"Okänd atom vid radslutet {word}")
     
     else:
         word = get_word(que)
