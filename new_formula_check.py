@@ -8,7 +8,7 @@ periodic_table = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', 'M
 'Pt', 'Au', 'Hg', 'Tl', 'Pb', 'Bi', 'Po', 'At', 'Rn', 'Fr', 'Ra', 'Ac', 'Th', 'Pa', 'U', 'Np', 'Pu',
 'Am', 'Cm', 'Bk', 'Cf', 'Es', 'Fm', 'Md', 'No', 'Lr', 'Rf', 'Db', 'Sg', 'Bh', 'Hs', 'Mt', 'Ds', 'Rg', 'Cn', 'Fl', "Lv"]
 
-DEBUG = False
+DEBUG = True
 
 class Syntaxfel(Exception):
     """
@@ -31,7 +31,8 @@ def formula():
                 que = LinkedQ()
                 for letter in molecule:
                     que.enqueue(letter)
-                returnvalue = ismolecule(que)
+                while not que.isEmpty():
+                    ismolecule(que)
                 print("Formeln är syntaktiskt korrekt")
             except Syntaxfel as err:
                 returnvalue = str(err.args[0])
@@ -42,7 +43,8 @@ def formulatest(molecule):
         que = LinkedQ()
         for letter in molecule:
             que.enqueue(letter)
-        returnvalue = ismolecule(que)
+        while not que.isEmpty():
+            ismolecule(que)
         return("Formeln är syntaktiskt korrekt")
     except Syntaxfel as err:
         returnvalue = str(err.args[0])
@@ -51,10 +53,15 @@ def formulatest(molecule):
 def ismolecule(que):
     if DEBUG:
         print("ismolecule")
-    que = isgroup(que)
-    if not que.isEmpty():
-        que = ismolecule(que)
-    return que
+        print(que)
+    isgroup(que)
+    if que.peek() == (")"):
+        pass
+        print("pass")
+    else:
+        if not que.isEmpty():
+            ismolecule(que)
+
 
 def isgroup(que):
     """ 
@@ -70,46 +77,22 @@ def isgroup(que):
         raise Syntaxfel("Enter something")
 
     elif que.peek().isalpha():
-        que = isatom(que)
-        que = isnum(que)
-        return que
+        isatom(que)
+        isnum(que)
     
     elif que.peek() == "(":
-        que = parenthesishandling(que)
-        return que
-   
-    else:
-        word = get_word(que)
-        raise Syntaxfel(f"Felaktig gruppstart vid radslutet {word}")
-
-    
-def parenthesishandling(que):
-    if DEBUG:
-        print("parenthesishandling")
-        print(que)
-
-    que.dequeue()
-
-    if que.peek() == "(":
-        que = parenthesishandling(que)
-
-    elif que.peek().isalpha():
+        que.dequeue()
         while not que.isEmpty():
-            que = isatom(que)
-            que = isnum(que)
-
-            if que.peek() == "(":
-                que = parenthesishandling(que)
-
+            ismolecule(que)
             if que.peek() == (")"):
                 que.dequeue()
                 if que.isEmpty():
                     word = get_word(que)
                     raise Syntaxfel(f"Saknad siffra vid radslutet {word}")
-                    
+                
                 elif que.peek().isdigit():
-                    que = isnum(que)
-                    return que
+                    isnum(que)
+                    return
                 
                 else:
                     word = get_word(que)
@@ -118,10 +101,11 @@ def parenthesishandling(que):
         word = get_word(que)
         raise Syntaxfel(f"Saknad högerparentes vid radslutet {word}") 
     
+
+   
     else:
         word = get_word(que)
-        raise Syntaxfel(f"Felaktig gruppstart vid radslutet {word}")
-           
+        raise Syntaxfel(f"Felaktig gruppstart vid radslutet {word}")        
       
 
 def isatom(que):
@@ -134,7 +118,7 @@ def isatom(que):
         secondletter = que.peek()
         if secondletter == None or not secondletter.isalpha():
             if firstletter in periodic_table:
-                return que
+                pass
             else: 
                 word = get_word(que)
                 raise Syntaxfel(f"Okänd atom vid radslutet {word}")
@@ -144,14 +128,14 @@ def isatom(que):
             secondletter = que.dequeue()
             atom = firstletter + secondletter
             if atom in periodic_table:
-                return que
+                pass
             else:
                 word = get_word(que)
                 raise Syntaxfel(f"Okänd atom vid radslutet {word}")
         
         else:
             if firstletter in periodic_table:
-                return que
+                pass
             else:
                 word = get_word(que)
                 raise Syntaxfel(f"Okänd atom vid radslutet {word}")
@@ -165,10 +149,10 @@ def isnum(que):
         print("isnum")
 
     if que.isEmpty() or que.peek() is None:
-        return que
+        pass
     
     elif not que.peek().isdigit():
-        return que
+        pass
     
     else:
         if que.peek() == "0":
@@ -183,7 +167,7 @@ def isnum(que):
             number = int(number)
 
             if number >= 2:
-                return que
+                pass
             
             else:
                 word = get_word(que)
